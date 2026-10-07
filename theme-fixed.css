@@ -1,0 +1,190 @@
+/* Keep the Maid Whale video; let OpenCode own geometry, buttons and state highlights. */
+:root[data-theme][data-color-scheme],
+:root[data-color-scheme],
+:root {
+  color-scheme: dark;
+  --background-base: transparent;
+  --background-weak: rgba(13, 23, 42, 0.70);
+  --background-strong: rgba(13, 23, 42, 0.90);
+  --background-stronger: rgba(13, 23, 42, 0.96);
+  --theme-glass-floating: rgba(12, 23, 42, 0.48);
+  --theme-glass-code: rgba(10, 20, 36, 0.32);
+  --surface-raised-stronger-non-alpha: var(--theme-glass-floating);
+  --surface-raised-stronger: var(--theme-glass-floating);
+  --surface-raised-strong: rgba(16, 28, 49, 0.94);
+  --input-base: rgba(16, 28, 49, 0.80);
+  --input-hover: rgba(24, 38, 62, 0.90);
+  --input-focus: rgba(24, 38, 62, 0.94);
+  --border-base: rgba(171, 196, 232, 0.18);
+  --border-weak-base: rgba(171, 196, 232, 0.12);
+  --v2-overlay-simple-overlay-scrim: rgba(3, 9, 19, 0.48);
+  --v2-background-bg-base: transparent;
+  --v2-background-bg-deep: rgba(8, 15, 29, 0.48);
+  --v2-background-bg-layer-01: rgba(13, 23, 42, 0.75);
+  --v2-background-bg-layer-02: rgba(16, 28, 49, 0.90);
+  --v2-background-bg-layer-03: rgba(24, 38, 62, 0.95);
+  --v2-background-bg-layer-04: rgba(31, 46, 71, 0.98);
+  --v2-text-text-base: #e8eef8;
+  --v2-text-text-muted: #b3c0d4;
+  --v2-text-text-faint: #90a1b9;
+  --v2-text-text-accent: #8db8ff;
+  --v2-icon-icon-base: #d8e5f6;
+  --v2-icon-icon-muted: #aabbd1;
+  --v2-icon-icon-faint: #8195af;
+  --v2-icon-icon-contrast: #f1f6ff;
+  --v2-icon-icon-accent: #8db8ff;
+  --v2-border-border-muted: rgba(171, 196, 232, 0.10);
+  --v2-border-border-base: rgba(171, 196, 232, 0.18);
+  --v2-border-border-strong: rgba(171, 196, 232, 0.28);
+  --v2-overlay-simple-overlay-hover: rgba(134, 178, 243, 0.12);
+  --v2-background-bg-button-neutral: rgba(134, 178, 243, 0.12);
+  --text-base: #c4d0e3;
+  --text-weak: #a9bad1;
+  --text-weaker: #8a9cb5;
+  --text-strong: #eaf1fd;
+  --icon-base: #c4d0e3;
+  --icon-weak: #a9bad1;
+  --icon-strong: #eaf1fd;
+  --icon-hover: #f1f6ff;
+  --icon-active: #9bc5ff;
+  --markdown-text: #dce7f6;
+  --markdown-heading: #f1f6ff;
+  --syntax-variable: #dce7f6;
+  --syntax-object: #dce7f6;
+  --syntax-comment: #91a6c1;
+  --syntax-punctuation: #b1c4dc;
+  --syntax-operator: #b1c4dc;
+  --syntax-keyword: #c4a6fa;
+  --syntax-string: #a3d9bd;
+  --syntax-type: #9ccaff;
+  --syntax-primitive: #f1c48d;
+}
+
+html, body, #root {
+  background-color: transparent !important;
+}
+
+#opencode-bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 12, 24, 0.68);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* No generic button, input, SVG, layout, or descendant background overrides. */
+[data-component="context-menu-content"],
+[data-component="context-menu-sub-content"],
+[data-component="dropdown-menu-content"],
+[data-component="dropdown-menu-sub-content"],
+[data-component="menu-v2-content"],
+[data-component="select-v2-content"],
+[data-component="popover-content"],
+[data-component="hover-card-content"],
+[data-component="hover-card-v2-content"],
+[data-component="dialog-v2"] [data-slot="dialog-container"],
+[data-dock-surface="shell"],
+[data-dock-surface="tray"] {
+  background: var(--theme-glass-floating) !important;
+  color: #e8eef8;
+  border-color: rgba(171, 196, 232, 0.20);
+  backdrop-filter: blur(12px) saturate(115%);
+  -webkit-backdrop-filter: blur(12px) saturate(115%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
+}
+
+/* Questions and permissions share the dock shell; never style its full-screen container. */
+[data-dock-surface="shell"],
+[data-dock-surface="tray"],
+[data-component="dialog-v2"] [data-slot="dialog-container"] {
+  background: var(--theme-glass-floating) !important;
+}
+
+[data-component="dock-prompt"][data-kind="question"] [data-slot="question-option"] {
+  background: rgba(31, 48, 73, 0.32);
+}
+
+[data-component="dock-prompt"][data-kind="question"] [data-slot="question-option"][data-picked="true"] {
+  background: rgba(55, 94, 145, 0.48);
+}
+
+[data-component="dock-prompt"][data-kind="question"] [data-slot="question-option"]:hover:not([data-picked="true"]) {
+  background: rgba(43, 64, 95, 0.50);
+}
+
+/* Code surfaces only, not syntax spans, selected text or diff rows. */
+[data-component="markdown"] pre,
+[data-component="code"],
+[data-component="write-content"] {
+  background: var(--theme-glass-code) !important;
+}
+
+/* Avoid stacked tint when a markdown wrapper already contains the code component. */
+[data-component="markdown"] pre:has([data-component="code"]),
+[data-component="write-content"] [data-component="code"] {
+  background: transparent !important;
+}
+
+.desktop-app-menu [data-component="menu-v2-item"] {
+  color: #e8eef8;
+}
+
+.desktop-app-menu [data-component="menu-v2-item"]:is(:hover, [data-highlighted], [data-expanded]) {
+  background: rgba(134, 178, 243, 0.16) !important;
+}
+
+.desktop-app-menu [data-component="menu-v2-item"][data-disabled] {
+  color: #8292aa;
+}
+
+/* Native Windows caption buttons overlay this surface; do not change geometry. */
+[data-slot="titlebar-v2"] {
+  background: transparent !important;
+  color: #d8e5f6;
+  border-bottom: 1px solid rgba(171, 196, 232, 0.12);
+}
+
+/* Top-level actions only, with original dimensions and native caption controls untouched. */
+[data-slot="titlebar-v2"] [data-component="icon-button-v2"]:not([data-titlebar-tab] *),
+[data-slot="titlebar-v2"] [data-titlebar-tab-action] {
+  background: rgba(7, 16, 31, 0.58) !important;
+}
+
+[data-slot="titlebar-v2"] [data-component="icon-button-v2"]:not([data-titlebar-tab] *):hover:not(:disabled),
+[data-slot="titlebar-v2"] [data-titlebar-tab-action]:hover:not(:disabled) {
+  background: rgba(18, 33, 54, 0.82) !important;
+}
+
+/* Session title/context/view bar: block transcript bleed-through while scrolling. */
+[data-session-title] > .pointer-events-auto {
+  background: linear-gradient(110deg, rgba(26, 40, 61, 0.94), rgba(14, 25, 44, 0.88)) !important;
+  backdrop-filter: blur(28px) saturate(125%);
+  -webkit-backdrop-filter: blur(28px) saturate(125%);
+  border-bottom: 1px solid rgba(171, 196, 232, 0.15);
+  box-shadow: 0 5px 18px rgba(4, 10, 20, 0.18);
+}
+
+/* Sent user bubble only: neutral white-grey glass with readable dark text. */
+:root body [data-component="user-message"]:not([data-pending]) [data-slot="user-message-text"] {
+  background: rgba(229, 233, 239, 0.62) !important;
+  color: #182334 !important;
+  --user-message-mention-prefix-color: #31558a;
+  backdrop-filter: blur(8px) saturate(110%);
+  -webkit-backdrop-filter: blur(8px) saturate(110%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(4, 10, 20, 0.12);
+}
+
+:root body [data-component="user-message"]:not([data-pending]) [data-slot="user-message-text"] .text-text-strong {
+  color: #182334 !important;
+}

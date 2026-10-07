@@ -1,0 +1,17 @@
+{
+  "name": "opencode-desktop-ds-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unofficial Windows OpenCode Desktop Maid Whale glass theme with local, verified deployment",
+  "license": "MIT",
+  "repository": "https://github.com/yunhesi-wind/opencode-desktop-ds-theme",
+  "scripts": {
+    "prepare-theme": "node deploy.cjs prepare",
+    "install-theme": "node deploy.cjs install",
+    "restore-theme": "node deploy.cjs restore",
+    "download-background": "node download-background.cjs",
+    "test": "node --test test/*.test.cjs"
+  },
+  "engines": { "node": ">=22.12.0" },
+  "dependencies": { "@electron/asar": "4.3.1" }
+}

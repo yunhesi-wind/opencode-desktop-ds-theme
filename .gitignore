@@ -1,0 +1,10 @@
+node_modules/
+assets/
+prepared/
+backups/
+*.download
+preview/native.css
+preview/*.png
+preview/*.jpg
+preview/*.webp
+*.log
