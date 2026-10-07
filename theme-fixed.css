@@ -8,6 +8,7 @@
   --background-strong: rgba(13, 23, 42, 0.90);
   --background-stronger: rgba(13, 23, 42, 0.96);
   --theme-glass-floating: rgba(12, 23, 42, 0.48);
+  --theme-glass-menu: rgba(12, 23, 42, 0.60);
   --theme-glass-code: rgba(10, 20, 36, 0.32);
   --surface-raised-stronger-non-alpha: var(--theme-glass-floating);
   --surface-raised-stronger: var(--theme-glass-floating);
@@ -101,6 +102,26 @@ body::before {
   border-color: rgba(171, 196, 232, 0.20);
   backdrop-filter: blur(12px) saturate(115%);
   -webkit-backdrop-filter: blur(12px) saturate(115%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
+}
+
+/* Menus are reading/selection surfaces, not the highly transparent question dock.
+   Body-scoped selectors also cover portals and nested selection menus. */
+:root body [data-component="menu-v2-content"],
+:root body [data-component="context-menu-content"],
+:root body [data-component="context-menu-sub-content"],
+:root body [data-component="dropdown-menu-content"],
+:root body [data-component="dropdown-menu-sub-content"],
+:root body [data-component="select-v2-content"],
+:root body [role="menu"],
+:root body [role="listbox"],
+:root body .session-summary-popover,
+:root body [data-component="popover-content"]:has([data-component="timeline-detail-control"]) {
+  background: var(--theme-glass-menu) !important;
+  color: #e8eef8;
+  backdrop-filter: blur(16px) saturate(115%);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+  border-color: rgba(171, 196, 232, 0.20);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
 }
 

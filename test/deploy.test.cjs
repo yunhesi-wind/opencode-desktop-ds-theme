@@ -46,6 +46,19 @@ test('floating and code surfaces use stronger transparency without clearing diff
   assert.doesNotMatch(css, /pre\s+\*\s*\{/);
 });
 
+test('summary and desktop nested menus share a readable dark-glass surface while docks stay transparent', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  assert.match(css, /--theme-glass-menu: rgba\(12, 23, 42, 0\.60\)/);
+  for (const selector of ['menu-v2-content', 'context-menu-sub-content', 'dropdown-menu-sub-content', 'select-v2-content']) {
+    assert.ok(css.includes(':root body [data-component="' + selector + '"]'));
+  }
+  assert.match(css, /\[role="listbox"\]/);
+  assert.match(css, /:root body \.session-summary-popover,/);
+  assert.match(css, /:has\(\[data-component="timeline-detail-control"\]\)/);
+  assert.match(css, /background: var\(--theme-glass-menu\) !important/);
+  assert.match(css, /--theme-glass-floating: rgba\(12, 23, 42, 0\.48\)/);
+});
+
 test('native caption patch only changes symbol colors and rejects unknown layouts', () => {
   const { fixCaptionColors } = require('../deploy.cjs');
   const code = 'function A9(e,t){return{color:`#00000000`,symbolColor:e===`dark`?`white`:`black`,height:44}}';
