@@ -118,10 +118,10 @@ test('failed prepare cleans only its new build and keeps installed archive uncha
   fs.mkdirSync(path.join(root, 'assets'));
   fs.copyFileSync(path.join(__dirname, '..', 'assets', 'zipzip-1080p.mp4'), path.join(root, 'assets', 'zipzip-1080p.mp4'));
   fs.copyFileSync(path.join(__dirname, '..', 'theme-fixed.css'), path.join(root, 'theme-fixed.css'));
-  // Fixture intentionally has no renderer HTML: failure occurs after creating the build directory.
-  await assert.rejects(prepare(app, root), /ENOENT/);
+  // Fixture intentionally has no renderer HTML: preflight must not publish any build.
+  await assert.rejects(prepare(app, root), /ENOENT|not found/);
   assert.equal(hash(path.join(app, 'resources', 'app.asar')), manifest.originalHash);
-  assert.deepEqual(fs.readdirSync(path.join(root, 'prepared')), []);
+  assert.equal(fs.existsSync(path.join(root, 'prepared')), false);
 }));
 
 test('repeated successful prepare reuses the original and removes new extraction directories', { skip: !assetAvailable }, () => fixture(async ({ root }) => {
@@ -150,4 +150,41 @@ test('repeated successful prepare reuses the original and removes new extraction
     assert.equal(fs.existsSync(path.join(root, 'prepared', entry.name, 'extracted')), false);
   }
   assert.equal(fs.existsSync(path.join(path.dirname(path.dirname(second.output)), 'original')), false);
+
+  // A supported desktop update must start a separate lineage, never reuse 2.0.24 bytes.
+  fs.writeFileSync(path.join(source, 'package.json'), '{"version":"2.0.25"}');
+  await asar.createPackage(source, installed);
+  const updatedHash = hash(installed);
+  const metadata = fs.readFileSync(path.join(root, 'prepared', 'manifest.json'));
+  await assert.rejects(prepare(app, root), /--upgrade/);
+  assert.deepEqual(fs.readFileSync(path.join(root, 'prepared', 'manifest.json')), metadata);
+  await prepare(app, root, { upgrade: true });
+  const upgraded = loadManifest('install', path.join(root, 'prepared', 'manifest.json'), root);
+  assert.equal(upgraded.version, '2.0.25');
+  assert.equal(upgraded.originalHash, updatedHash);
+  assert.notEqual(upgraded.snapshot, second.snapshot);
+  assert.deepEqual(upgraded.acceptedThemedHashes, []);
+  assert.equal(hash(installed), updatedHash);
+  assert.equal(hash(second.snapshot), before);
+  assert.deepEqual(fs.readFileSync(path.join(path.dirname(path.dirname(upgraded.output)), 'previous-manifest.json')), metadata);
+  const { resolveExpectedCurrent } = require('../deploy.cjs');
+  assert.throws(() => resolveExpectedCurrent(second, updatedHash, true), /differs/);
+  assert.throws(() => resolveExpectedCurrent(upgraded, second.themedHash, false), /differs/);
+
+  // --upgrade is not a bypass for arbitrary versions or same-version modifications.
+  fs.writeFileSync(path.join(source, 'extra.txt'), 'unknown same-version change');
+  await asar.createPackage(source, installed);
+  await assert.rejects(prepare(app, root, { upgrade: true }), /differs/);
+  fs.writeFileSync(path.join(source, 'package.json'), '{"version":"2.0.26"}');
+  await asar.createPackage(source, installed);
+  await assert.rejects(prepare(app, root, { upgrade: true }), /Unsupported Desktop version/);
+  fs.writeFileSync(path.join(source, 'package.json'), '{"version":"2.0.24"}');
+  await asar.createPackage(source, installed);
+  await assert.rejects(prepare(app, root, { upgrade: true }), /newer/);
+  fs.writeFileSync(path.join(source, 'package.json'), '{"version":"2.0.25"}');
+  fs.writeFileSync(path.join(source, 'out', 'renderer', 'index.html'), '<head></head><body><style id="opencode-bg-correct-override"></style></body>');
+  await asar.createPackage(source, installed);
+  // Even without old metadata, a themed archive cannot become a clean original.
+  const isolated = path.join(root, 'isolated');
+  await assert.rejects(prepare(app, isolated, { upgrade: true }), /already themed/);
 }));

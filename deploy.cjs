@@ -9,6 +9,7 @@ const ROOT = __dirname;
 const APP = path.join(process.env.LOCALAPPDATA || '', 'Programs', '@opencode-aidesktop');
 const PRESET = require('./background.cjs');
 const MANIFEST = path.join(ROOT, 'prepared', 'manifest.json');
+const SUPPORTED_VERSIONS = ['2.0.24', '2.0.25'];
 const hash = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
 function archiveInfo(file) {
@@ -77,23 +78,41 @@ function fixCaptionColors(source) {
   return source.replace(old, 'symbolColor:`#d8e5f6`');
 }
 
-async function prepare(app = APP, root = ROOT) {
+async function prepare(app = APP, root = ROOT, { upgrade = false } = {}) {
   const manifestPath = path.join(root, 'prepared', 'manifest.json');
   const installed = path.join(app, 'resources', 'app.asar');
   const installedHash = hash(installed);
+  const installedInfo = archiveInfo(installed);
+  if (!SUPPORTED_VERSIONS.includes(installedInfo.version)) {
+    throw new Error('Unsupported Desktop version: ' + installedInfo.version);
+  }
   let original = installed;
   let acceptedThemedHashes = [];
   if (fs.existsSync(manifestPath)) {
-    const previous = loadManifest('prepare', manifestPath, root);
+    const previous = readManifest(manifestPath);
     if (previous.app !== app) throw new Error('Existing manifest targets another installation.');
-    acceptedThemedHashes = [...new Set([previous.themedHash, ...(previous.acceptedThemedHashes || [])])];
-    if (installedHash !== previous.originalHash && !acceptedThemedHashes.includes(installedHash)) {
-      throw new Error('Installed app differs from all recorded versions.');
+    if (installedInfo.version !== previous.version) {
+      if (!upgrade) throw new Error('Desktop updated. Run node deploy.cjs prepare --upgrade to build for the installed version.');
+      if (SUPPORTED_VERSIONS.indexOf(installedInfo.version) <= SUPPORTED_VERSIONS.indexOf(previous.version)) {
+        throw new Error('Upgrade preparation requires a newer supported Desktop version.');
+      }
+      // Keep the previous snapshot/metadata, but never carry its hashes into the new version.
+    } else {
+      acceptedThemedHashes = [...new Set([previous.themedHash, ...(previous.acceptedThemedHashes || [])])];
+      if (installedHash !== previous.originalHash && !acceptedThemedHashes.includes(installedHash)) {
+        throw new Error('Installed app differs from all recorded versions.');
+      }
+      original = findOriginal(previous, root);
     }
-    original = previous.snapshot;
   }
   const info = archiveInfo(original);
-  if (info.version !== '2.0.24') throw new Error('This prepared deployment is validated for Desktop 2.0.24 only.');
+  if (info.version !== installedInfo.version) throw new Error('Original snapshot version differs from installed Desktop.');
+  // Preflight before creating files or trusting an unknown archive as a clean snapshot.
+  const html = asar.extractFile(original, path.join('out', 'renderer', 'index.html')).toString('utf8');
+  if (html.includes('opencode-bg-correct-override') || html.includes('opencode-bg-video')) {
+    throw new Error('Unsupported or already themed renderer layout.');
+  }
+  fixCaptionColors(asar.extractFile(original, path.join('out', 'main', 'index.js')).toString('utf8'));
   const asset = path.join(root, 'assets', PRESET.filename);
   verifyAsset(asset);
   const originalHash = hash(original);
@@ -177,7 +196,7 @@ async function buildTheme(snapshot, stage, info, originals, asset, themeCss) {
 
 function readManifest(file) {
   const m = JSON.parse(fs.readFileSync(file, 'utf8'));
-  if (m.format !== 1 || m.version !== '2.0.24') throw new Error('Unsupported manifest.');
+  if (m.format !== 1 || !SUPPORTED_VERSIONS.includes(m.version)) throw new Error('Unsupported manifest.');
   return m;
 }
 
@@ -258,7 +277,12 @@ function resolveExpectedCurrent(manifest, installedHash, restore) {
 if (require.main === module) {
   const command = process.argv[2];
   Promise.resolve().then(() => {
-    if (command === 'prepare') return prepare();
+    if (command === 'prepare') {
+      if (process.argv.length > 3 && (process.argv[3] !== '--upgrade' || process.argv.length !== 4)) {
+        throw new Error('Usage: node deploy.cjs prepare [--upgrade]');
+      }
+      return prepare(APP, ROOT, { upgrade: process.argv[3] === '--upgrade' });
+    }
     if (command === 'install') return apply();
     if (command === 'restore') {
       if (process.argv[3] && (process.argv[3] !== '--backup' || !process.argv[4] || process.argv.length !== 5)) {
@@ -266,7 +290,7 @@ if (require.main === module) {
       }
       return apply(true, process.argv[4] ? path.resolve(process.argv[4]) : undefined);
     }
-    throw new Error('Usage: node deploy.cjs prepare|install|restore [--backup <directory>]');
+    throw new Error('Usage: node deploy.cjs prepare [--upgrade] | install | restore [--backup <directory>]');
   }).catch((error) => { console.error(error.message); process.exitCode = 1; });
 }
 

@@ -22,7 +22,7 @@
 | 环境 | 支持范围 |
 |---|---|
 | 系统 | Windows，仅此平台经过本机验收 |
-| OpenCode Desktop | **2.0.24**，其他版本明确拒绝，不承诺兼容 |
+| OpenCode Desktop | **2.0.24 / 2.0.25**，其他版本明确拒绝；2.0.25 已完成本机资源构建校验，视觉效果需安装后验收 |
 | Node.js | >= 22.12.0 |
 | 安装位置 | `%LOCALAPPDATA%\Programs\@opencode-aidesktop` |
 | 网络工具 | `curl.exe`、PowerShell（系统自带） |
@@ -72,6 +72,21 @@ node deploy.cjs install
 在同一目录更新源码后重新 `prepare`，退出桌面版再安装；构建会复用经校验的干净原包。
 当前应用哈希未知、版本不同、原生文件或素材校验失败时拒绝覆盖。
 
+### OpenCode 从 2.0.24 更新到 2.0.25 后
+
+官方更新会覆盖美化资源；旧 manifest 不可直接用于安装或恢复新版。
+**保存工作并完全退出桌面版**，双击 `Upgrade-Theme.cmd`，或执行：
+
+```powershell
+node deploy.cjs prepare --upgrade
+node deploy.cjs install
+```
+
+只有第一条成功后才能安装。升级构建使用当前新版原包，独立校验原生文件；
+保留旧 snapshot、备份及 `previous-manifest.json`，不继承旧版主题哈希。
+`--upgrade` 只允许更高的已支持版本，不放行未知版本、降级、同版本未知修改或已美化原包。
+构建时无需退出桌面版，但安装时必须退出；脚本不会强制结束进程。
+
 恢复：退出桌面版，双击 `Restore-Theme.cmd` 或执行 `node deploy.cjs restore`。
 主题包损坏／丢失不阻断原包恢复，原始 snapshot 不可用时查找验证过的备份。
 若主 manifest 损坏，可以指定备份目录：
@@ -101,6 +116,7 @@ CSS 静态检查不等于所有真实组件视觉回归，当前视觉验收来�
 
 ```text
 deploy.cjs                 # 版本绑定的本机构建、安装、恢复
+Upgrade-Theme.cmd           # 已支持的桌面更新后，重新构建并安装
 storage.cjs                # manifest 与备份发布
 theme-fixed.css            # 发布时注入的完整改版效果
 background.cjs             # 固定素材来源、大小、哈希
