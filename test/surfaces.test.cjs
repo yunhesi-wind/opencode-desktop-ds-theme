@@ -21,16 +21,15 @@ test('opaque reading token is separate from translucent menu and question surfac
 });
 
 test('sticky surfaces only override their native background color token', () => {
-  const sticky = rules.filter((rule) => rule[1].includes('[data-component="collapsed-tool-group"]'));
+  const sticky = rules.filter((rule) => rule[1].includes('[data-slot="session-review-change-summary"]'));
   assert.equal(sticky.length, 1);
   assert.equal(sticky[0][2].trim(), '--v2-background-bg-base: var(--theme-reading-sticky);');
   assert.equal(sticky[0][1].trim(), [
-    ':root body [data-component="collapsed-tool-group"] > [data-component="collapsible"].tool-collapsible > [data-slot="collapsible-trigger"][aria-expanded="true"]',
-    ':root body :is([data-component="edit-tool"], [data-component="write-tool"], [data-component="apply-patch-tool"]) > [data-component="collapsible"] > [data-slot="collapsible-trigger"]:is([aria-expanded="true"], [data-locked])',
     ':root body [data-component="session-review"] [data-slot="session-review-change-summary"]',
     ':root body [data-component="session-turn"] [data-slot="session-turn-diffs-header"]',
   ].join(',\n'));
   assert.doesNotMatch(css, /\.home-session-group-header/);
+  assert.doesNotMatch(css, /\[data-component="(?:collapsed-tool-group|edit-tool|write-tool|apply-patch-tool)"\]/);
 });
 
 test('selection menus paint outer surfaces rather than nested semantic listboxes', () => {

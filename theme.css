@@ -117,8 +117,6 @@
 /* Restore native occlusion only where the app already uses a sticky reading surface.
    Local tokens also feed native fade pseudo-elements. Preserve hover/pressed rules,
    offsets, clipping, z-index, pointer behavior and scroll-linked animation. */
-:root body [data-component="collapsed-tool-group"] > [data-component="collapsible"].tool-collapsible > [data-slot="collapsible-trigger"][aria-expanded="true"],
-:root body :is([data-component="edit-tool"], [data-component="write-tool"], [data-component="apply-patch-tool"]) > [data-component="collapsible"] > [data-slot="collapsible-trigger"]:is([aria-expanded="true"], [data-locked]),
 :root body [data-component="session-review"] [data-slot="session-review-change-summary"],
 :root body [data-component="session-turn"] [data-slot="session-turn-diffs-header"] {
   --v2-background-bg-base: var(--theme-reading-sticky);
