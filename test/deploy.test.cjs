@@ -27,7 +27,7 @@ test('menus and sticky session toolbar have an opaque-enough glass backdrop', ()
 test('existing UI rules only change paint, never geometry, motion or input behavior', () => {
   const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const paint = new Set(['background', 'background-color', 'color', 'border-color', 'border-bottom-color',
-    'backdrop-filter', '-webkit-backdrop-filter', 'box-shadow']);
+    'backdrop-filter', '-webkit-backdrop-filter', 'box-shadow', 'scrollbar-color']);
   const decoration = new Set(['#opencode-bg-video', 'body::before']);
   let rules = 0;
   for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -44,6 +44,13 @@ test('existing UI rules only change paint, never geometry, motion or input behav
           'Custom tokens must remain colors: ' + property);
       } else {
         assert.ok(paint.has(property), 'Non-paint override on ' + selector + ': ' + property);
+        if (property === 'scrollbar-color') {
+          for (const target of selector.split(',')) {
+            assert.ok(target.trim().startsWith(':root body '), 'Native scrollbar paint must stay scoped');
+            assert.doesNotMatch(target, /\*|\.overflow-|diffs-container|file-tree-container|terminal/);
+          }
+          assert.equal(value, '#627b9e transparent');
+        }
       }
     }
   }
@@ -63,7 +70,7 @@ test('decorative background cannot intercept native UI input', () => {
 
 test('question, permission and dialog surfaces cover legacy white surface tokens without rewriting layout', () => {
   const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
-  assert.match(css, /--surface-raised-stronger-non-alpha: var\(--theme-glass-floating\)/);
+  assert.match(css, /--surface-raised-stronger-non-alpha: var\(--theme-reading-sticky\)/);
   for (const selector of ['[data-dock-surface="shell"]', '[data-dock-surface="tray"]',
     '[data-component="dialog-v2"] [data-slot="dialog-container"]', '[data-component="select-v2-content"]',
     '[data-component="popover-content"]', '[data-component="hover-card-content"]']) {
@@ -89,7 +96,8 @@ test('summary and desktop nested menus share a readable dark-glass surface while
   for (const selector of ['menu-v2-content', 'context-menu-sub-content', 'dropdown-menu-sub-content', 'select-v2-content']) {
     assert.ok(css.includes(':root body [data-component="' + selector + '"]'));
   }
-  assert.match(css, /\[role="listbox"\]/);
+  assert.match(css, /:root body \[data-slot="select-v2-content"\]/);
+  assert.doesNotMatch(css, /\[role="(?:listbox|menu)"\]/);
   assert.match(css, /:root body \.session-summary-popover,/);
   assert.match(css, /:has\(\[data-component="timeline-detail-control"\]\)/);
   assert.match(css, /background: var\(--theme-glass-menu\) !important/);

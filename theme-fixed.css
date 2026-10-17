@@ -9,14 +9,41 @@
   --theme-glass-floating: rgba(12, 23, 42, 0.48);
   --theme-glass-menu: rgba(12, 23, 42, 0.60);
   --theme-glass-code: rgba(10, 20, 36, 0.32);
-  --surface-raised-stronger-non-alpha: var(--theme-glass-floating);
+  --theme-reading-sticky: #101e33;
+  /* Native consumers of this token rely on opaque backing (e.g. list headers). */
+  --surface-raised-stronger-non-alpha: var(--theme-reading-sticky);
   --surface-raised-stronger: var(--theme-glass-floating);
   --surface-raised-strong: rgba(16, 28, 49, 0.94);
+  /* Bridge legacy controls through colors, never through state selector overrides. */
+  --surface-base: rgba(134, 178, 243, 0.06);
+  --surface-base-hover: rgba(134, 178, 243, 0.12);
+  --surface-base-active: rgba(134, 178, 243, 0.20);
+  --surface-raised-base: rgba(16, 28, 49, 0.90);
+  --surface-raised-base-hover: rgba(43, 64, 95, 0.94);
+  --surface-raised-base-active: rgba(55, 78, 112, 0.96);
+  --surface-raised-strong-hover: rgba(43, 64, 95, 0.96);
+  --surface-raised-stronger-hover: rgba(55, 78, 112, 0.98);
+  --surface-float-base: #101c31;
+  --surface-float-base-hover: #1b2d47;
+  --button-secondary-base: #14233a;
+  --button-secondary-hover: #223955;
+  --button-ghost-hover: rgba(134, 178, 243, 0.12);
+  --button-ghost-hover2: rgba(134, 178, 243, 0.20);
   --input-base: rgba(16, 28, 49, 0.80);
   --input-hover: rgba(24, 38, 62, 0.90);
   --input-focus: rgba(24, 38, 62, 0.94);
+  --input-active: #182b46;
+  --input-selected: #294568;
+  --input-disabled: #1c293c;
   --border-base: rgba(171, 196, 232, 0.18);
   --border-weak-base: rgba(171, 196, 232, 0.12);
+  --border-hover: rgba(171, 196, 232, 0.36);
+  --border-active: rgba(171, 196, 232, 0.52);
+  --border-focus: #8db8ff;
+  --border-selected: #8db8ff;
+  --border-disabled: rgba(171, 196, 232, 0.16);
+  --border-strong-base: rgba(171, 196, 232, 0.40);
+  --border-weaker-base: rgba(171, 196, 232, 0.08);
   --v2-overlay-simple-overlay-scrim: rgba(3, 9, 19, 0.48);
   --v2-background-bg-base: transparent;
   --v2-background-bg-deep: rgba(8, 15, 29, 0.48);
@@ -28,25 +55,47 @@
   --v2-text-text-muted: #b3c0d4;
   --v2-text-text-faint: #90a1b9;
   --v2-text-text-accent: #8db8ff;
+  --v2-text-text-accent-hover: #b7d4ff;
+  --v2-text-text-code-accent: #a9caff;
+  --v2-text-text-code-path: #a9d8ee;
+  --v2-background-bg-code-path: #163148;
   --v2-icon-icon-base: #d8e5f6;
   --v2-icon-icon-muted: #aabbd1;
   --v2-icon-icon-faint: #8195af;
   --v2-icon-icon-contrast: #f1f6ff;
   --v2-icon-icon-accent: #8db8ff;
+  --v2-icon-icon-accent-hover: #b7d4ff;
   --v2-border-border-muted: rgba(171, 196, 232, 0.10);
   --v2-border-border-base: rgba(171, 196, 232, 0.18);
   --v2-border-border-strong: rgba(171, 196, 232, 0.28);
+  --v2-border-border-focus: #8db8ff;
   --v2-overlay-simple-overlay-hover: rgba(134, 178, 243, 0.12);
+  --v2-overlay-simple-overlay-pressed: rgba(134, 178, 243, 0.22);
   --v2-background-bg-button-neutral: rgba(134, 178, 243, 0.12);
   --text-base: #c4d0e3;
   --text-weak: #a9bad1;
   --text-weaker: #8a9cb5;
   --text-strong: #eaf1fd;
+  --text-stronger: #f1f6ff;
+  --text-interactive-base: #9bc5ff;
   --icon-base: #c4d0e3;
   --icon-weak: #a9bad1;
   --icon-strong: #eaf1fd;
   --icon-hover: #f1f6ff;
   --icon-active: #9bc5ff;
+  --icon-weak-base: #a9bad1;
+  --icon-weak-hover: #d8e5f6;
+  --icon-weak-active: #9bc5ff;
+  --icon-weak-selected: #b7d4ff;
+  --icon-weak-focus: #d8e5f6;
+  --icon-weak-disabled: #6c7d96;
+  --icon-strong-base: #eaf1fd;
+  --icon-strong-hover: #f1f6ff;
+  --icon-strong-active: #b7d4ff;
+  --icon-strong-selected: #b7d4ff;
+  --icon-strong-focus: #f1f6ff;
+  --icon-strong-disabled: #6c7d96;
+  --icon-disabled: #6c7d96;
   --markdown-text: #dce7f6;
   --markdown-heading: #f1f6ff;
   --syntax-variable: #dce7f6;
@@ -58,6 +107,82 @@
   --syntax-string: #a3d9bd;
   --syntax-type: #9ccaff;
   --syntax-primitive: #f1c48d;
+  --syntax-property: #c4b5ee;
+  --syntax-constant: #9ad9e2;
+  --syntax-regexp: #a3d9bd;
+  --markdown-link-text: #9bc5ff;
+  --markdown-image-text: #a9d8ee;
+}
+
+/* Restore native occlusion only where the app already uses a sticky reading surface.
+   Local tokens also feed native fade pseudo-elements. Preserve hover/pressed rules,
+   offsets, clipping, z-index, pointer behavior and scroll-linked animation. */
+:root body [data-component="collapsed-tool-group"] > [data-component="collapsible"].tool-collapsible > [data-slot="collapsible-trigger"][aria-expanded="true"],
+:root body :is([data-component="edit-tool"], [data-component="write-tool"], [data-component="apply-patch-tool"]) > [data-component="collapsible"] > [data-slot="collapsible-trigger"]:is([aria-expanded="true"], [data-locked]),
+:root body [data-component="session-review"] [data-slot="session-review-change-summary"],
+:root body [data-component="session-turn"] [data-slot="session-turn-diffs-header"] {
+  --v2-background-bg-base: var(--theme-reading-sticky);
+}
+
+/* Component-local token: native question rules declare this on the prompt, not root. */
+:root body [data-component="dock-prompt"][data-kind="question"] {
+  --v2-question-answer-bg-selected: #294568;
+}
+
+/* Only recolor native thumb tokens: preserve size, hit area, visibility and transitions. */
+:root body .scroll-view__thumb {
+  --border-weak-base: #627b9e;
+  --border-strong-base: #a5bfe2;
+}
+
+/* Existing Shadow DOM hook; do not override the tree's hover-only visibility token. */
+:root body file-tree-container {
+  --trees-scrollbar-thumb-override: #627b9e;
+}
+
+/* Verified native overflow containers only. Do not use body-wide or overflow utility
+   selectors: those can reach hidden/custom scrollbars and complex shadow renderers.
+   Standard color-only styling retains UA metrics and interaction feedback. */
+:root body .session-service-menu,
+:root body [data-component="menu-v2-content"][data-slot="select-v2-content"] [data-slot="select-v2-listbox"],
+:root body .directory-picker-browser,
+:root body .ssh-prompt,
+:root body .settings-nav-groups,
+:root body .settings-mobile-menu[data-component="menu-v2-content"],
+:root body .settings-provider-account-list,
+:root body .settings-wsl-distro-list,
+:root body .settings-wsl-catalog-list,
+:root body [data-component="line-comment-v2"][data-variant="editor"] [data-slot="line-comment-v2-mention-list"],
+:root body [data-component="line-comment"] [data-slot="line-comment-mention-list"],
+:root body [data-slot="message-nav-hovercard-content"],
+:root body [data-component="session-turn"] .error-card,
+:root body [data-component="card"][data-kind="tool-error-card"] [data-slot="tool-error-card-subtitle"],
+:root body .project-settings-extension-tabs [data-slot="tabs-v2-content"],
+:root body [data-component="tabs-v2"][data-variant="settings"][data-orientation="vertical"] > [data-slot="tabs-v2-list"],
+:root body [data-component="image-preview"] [data-slot="image-preview-container"] [data-slot="image-preview-content"] [data-slot="image-preview-body"],
+:root body [data-component="markdown"] table,
+:root body [data-component="markdown"] [data-component="markdown-mermaid"] {
+  scrollbar-color: #627b9e transparent;
+}
+
+/* Stage two: the app's inherited shadow-renderer paint hook, dark mode only.
+   Opaque reading backing avoids repeated translucent layers in virtualized code.
+   Keep native syntax, red/green diffs, selection, search alpha and scrollbar rules. */
+:root[data-color-scheme="dark"] body [data-component="file"],
+:root[data-color-scheme="dark"] body [data-component="file"] diffs-container {
+  --opencode-diffs-bg: #101e33;
+  --v2-text-text-faint: #9aafc9;
+  --surface-warning-base: #b9985b;
+  --surface-warning-strong: #d2a35a;
+}
+
+/* Native word-emphasis uses green/red-1200 in its light branch. The DS surface
+   is dark in both app schemes, so keep these local foregrounds readable without
+   changing color-scheme, diff fills, syntax spans, highlight ranges or state rules. */
+:root body [data-component="file"],
+:root body [data-component="file"] diffs-container {
+  --v2-green-1200: #d9f7e4;
+  --v2-red-1200: #ffe0da;
 }
 
 html, body, #root {
@@ -105,15 +230,15 @@ body::before {
 }
 
 /* Menus are reading/selection surfaces, not the highly transparent question dock.
-   Body-scoped selectors also cover portals and nested selection menus. */
+   Paint actual portal surfaces, never nested semantic role=menu/listbox lists. */
 :root body [data-component="menu-v2-content"],
 :root body [data-component="context-menu-content"],
 :root body [data-component="context-menu-sub-content"],
 :root body [data-component="dropdown-menu-content"],
 :root body [data-component="dropdown-menu-sub-content"],
 :root body [data-component="select-v2-content"],
-:root body [role="menu"],
-:root body [role="listbox"],
+:root body [data-slot="select-v2-content"],
+:root body .session-service-menu,
 :root body .session-summary-popover,
 :root body [data-component="popover-content"]:has([data-component="timeline-detail-control"]) {
   background: var(--theme-glass-menu) !important;
@@ -170,7 +295,7 @@ body::before {
 :root body [data-component="user-message"]:not([data-pending]) [data-slot="user-message-text"] {
   background: rgba(229, 233, 239, 0.62) !important;
   color: #182334 !important;
-  --user-message-mention-prefix-color: #31558a;
+  --user-message-mention-prefix-color: #182a40;
   backdrop-filter: blur(8px) saturate(110%);
   -webkit-backdrop-filter: blur(8px) saturate(110%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(4, 10, 20, 0.12);

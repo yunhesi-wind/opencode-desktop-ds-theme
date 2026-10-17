@@ -139,7 +139,7 @@ async function prepare(app = APP, root = ROOT, { upgrade = false } = {}) {
     writeJsonAtomic(manifestPath, {
       format: 1, version: info.version, preset: PRESET.id, app,
       originalHash, themedHash: hash(output), snapshot, output, unpacked: originals,
-      acceptedThemedHashes, revision: 'native-ui-preserved',
+      acceptedThemedHashes, revision: 'history-seam-select-scrollbar',
       created: new Date().toISOString(), upstreamCommit: 'b59ba94581ffb2d48b4e180194c119c9661cab99',
     });
     published = true;
