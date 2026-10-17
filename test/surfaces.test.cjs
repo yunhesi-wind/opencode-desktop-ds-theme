@@ -6,7 +6,7 @@ const asar = require('@electron/asar');
 const { archiveInfo } = require('../deploy.cjs');
 
 const root = path.join(__dirname, '..');
-const css = fs.readFileSync(path.join(root, 'theme-fixed.css'), 'utf8')
+const css = fs.readFileSync(path.join(root, 'theme.css'), 'utf8')
   .replace(/\r\n?/g, '\n') // Keep exact selector assertions portable across Git checkout settings.
   .replace(/\/\*[\s\S]*?\*\//g, '');
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
@@ -44,7 +44,7 @@ test('selection menus paint outer surfaces rather than nested semantic listboxes
   assert.equal(listbox[0][2].trim(), 'scrollbar-color: #627b9e transparent;');
 });
 
-const manifestFile = path.join(root, 'prepared', 'manifest.json');
+const manifestFile = path.join(root, 'runtime', 'manifest.json');
 const manifest = fs.existsSync(manifestFile) ? JSON.parse(fs.readFileSync(manifestFile, 'utf8')) : undefined;
 test('local original confirms native sticky tokens and separate select surface/listbox nodes',
   { skip: !manifest?.snapshot || !fs.existsSync(manifest.snapshot) }, () => {

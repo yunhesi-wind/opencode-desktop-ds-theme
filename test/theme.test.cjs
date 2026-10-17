@@ -8,7 +8,7 @@ const asar = require('@electron/asar');
 const { archiveInfo, unpackedHashes, verifyAsset, replaceArchive, unpackOptions } = require('../deploy.cjs');
 
 test('fixed CSS does not rewrite native button borders, icon sizes or descendant backgrounds', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.doesNotMatch(css, /button\s*(?::hover)?\s*\{/);
   assert.doesNotMatch(css, /#root\s*>\s*div\s*\*/);
   assert.doesNotMatch(css, /\b(?:padding|margin|border-radius)\s*:/);
@@ -16,7 +16,7 @@ test('fixed CSS does not rewrite native button borders, icon sizes or descendant
 });
 
 test('menus and sticky session toolbar have an opaque-enough glass backdrop', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.match(css, /\[data-component="menu-v2-content"\]/);
   assert.match(css, /\[data-session-title\]\s*>\s*\.pointer-events-auto/);
   assert.match(css, /backdrop-filter:\s*blur\(28px\)/);
@@ -25,7 +25,7 @@ test('menus and sticky session toolbar have an opaque-enough glass backdrop', ()
 });
 
 test('existing UI rules only change paint, never geometry, motion or input behavior', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const paint = new Set(['background', 'background-color', 'color', 'border-color', 'border-bottom-color',
     'backdrop-filter', '-webkit-backdrop-filter', 'box-shadow', 'scrollbar-color']);
   const decoration = new Set(['#opencode-bg-video', 'body::before']);
@@ -58,7 +58,7 @@ test('existing UI rules only change paint, never geometry, motion or input behav
 });
 
 test('decorative background cannot intercept native UI input', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   for (const selector of ['#opencode-bg-video', 'body::before']) {
     const start = css.indexOf(selector + ' {');
     const block = css.slice(start, css.indexOf('}', start));
@@ -69,7 +69,7 @@ test('decorative background cannot intercept native UI input', () => {
 });
 
 test('question, permission and dialog surfaces cover legacy white surface tokens without rewriting layout', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.match(css, /--surface-raised-stronger-non-alpha: var\(--theme-reading-sticky\)/);
   for (const selector of ['[data-dock-surface="shell"]', '[data-dock-surface="tray"]',
     '[data-component="dialog-v2"] [data-slot="dialog-container"]', '[data-component="select-v2-content"]',
@@ -82,7 +82,7 @@ test('question, permission and dialog surfaces cover legacy white surface tokens
 });
 
 test('floating and code surfaces use stronger transparency without clearing diff-row highlights', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.match(css, /--theme-glass-floating: rgba\(12, 23, 42, 0\.48\)/);
   assert.match(css, /--theme-glass-code: rgba\(10, 20, 36, 0\.32\)/);
   assert.match(css, /\[data-component="markdown"\] pre/);
@@ -91,7 +91,7 @@ test('floating and code surfaces use stronger transparency without clearing diff
 });
 
 test('summary and desktop nested menus share a readable dark-glass surface while docks stay transparent', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.match(css, /--theme-glass-menu: rgba\(12, 23, 42, 0\.60\)/);
   for (const selector of ['menu-v2-content', 'context-menu-sub-content', 'dropdown-menu-sub-content', 'select-v2-content']) {
     assert.ok(css.includes(':root body [data-component="' + selector + '"]'));
@@ -104,16 +104,8 @@ test('summary and desktop nested menus share a readable dark-glass surface while
   assert.match(css, /--theme-glass-floating: rgba\(12, 23, 42, 0\.48\)/);
 });
 
-test('native caption patch only changes symbol colors and rejects unknown layouts', () => {
-  const { fixCaptionColors } = require('../deploy.cjs');
-  const code = 'function A9(e,t){return{color:`#00000000`,symbolColor:e===`dark`?`white`:`black`,height:44}}';
-  assert.equal(fixCaptionColors(code), code.replace('symbolColor:e===`dark`?`white`:`black`', 'symbolColor:`#d8e5f6`'));
-  assert.throws(() => fixCaptionColors('unknown version'), /Unsupported/);
-  assert.throws(() => fixCaptionColors(code + code), /Unsupported/);
-});
-
 test('sent message glass bubble is scoped and uses contrasting dark text', () => {
-  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8');
   assert.match(css, /\[data-component="user-message"\]:not\(\[data-pending\]\) \[data-slot="user-message-text"\]/);
   assert.match(css, /background: rgba\(229, 233, 239, 0\.62\) !important/);
   assert.match(css, /color: #182334 !important/);
@@ -161,7 +153,7 @@ test('repacking preserves both native and auxiliary unpacked files byte-for-byte
   try {
     const src = path.join(root, 'source');
     fs.mkdirSync(path.join(src, 'native'), { recursive: true });
-    fs.writeFileSync(path.join(src, 'package.json'), JSON.stringify({ version: '2.0.24' }));
+    fs.writeFileSync(path.join(src, 'package.json'), JSON.stringify({ version: '2.0.32' }));
     fs.writeFileSync(path.join(src, 'native', 'fake.node'), 'not executable; test data');
     fs.writeFileSync(path.join(src, 'native', 'helper.js'), 'fixture helper data');
     fs.writeFileSync(path.join(src, 'packed.js'), 'packed fixture data');

@@ -1,4 +1,4 @@
-/* Keep the Maid Whale video; let OpenCode own geometry, buttons and state highlights. */
+/* 深海大肥鱼 palette. theme.cjs gates every selector to ds-deepsea at build time. */
 :root[data-theme][data-color-scheme],
 :root[data-color-scheme],
 :root {

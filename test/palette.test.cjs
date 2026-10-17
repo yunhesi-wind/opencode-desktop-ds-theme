@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8')
+const css = fs.readFileSync(path.join(__dirname, '..', 'theme.css'), 'utf8')
   .replace(/\r\n?/g, '\n') // Windows Git checkouts may use CRLF; compare CSS, not line endings.
   .replace(/\/\*[\s\S]*?\*\//g, '');
 

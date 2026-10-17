@@ -6,7 +6,7 @@ const asar = require('@electron/asar');
 const { archiveInfo } = require('../deploy.cjs');
 
 const root = path.join(__dirname, '..');
-const css = fs.readFileSync(path.join(root, 'theme-fixed.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+const css = fs.readFileSync(path.join(root, 'theme.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
 const targets = [
   ':root[data-color-scheme="dark"] body [data-component="file"]',
@@ -77,7 +77,7 @@ test('file backing, line numbers and ordinary text on search fills have readable
   // This does not establish contrast for every native syntax token or combined diff highlight.
 });
 
-const manifestPath = path.join(root, 'prepared', 'manifest.json');
+const manifestPath = path.join(root, 'runtime', 'manifest.json');
 const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, 'utf8')) : undefined;
 const snapshot = manifest?.snapshot;
 test('local native renderer supports the paint bridge while retaining selection and search rules',
