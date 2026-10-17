@@ -9,7 +9,7 @@ const ROOT = __dirname;
 const APP = path.join(process.env.LOCALAPPDATA || '', 'Programs', '@opencode-aidesktop');
 const PRESET = require('./background.cjs');
 const MANIFEST = path.join(ROOT, 'prepared', 'manifest.json');
-const SUPPORTED_VERSIONS = ['2.0.24', '2.0.25'];
+const SUPPORTED_VERSIONS = ['2.0.24', '2.0.25', '2.0.32'];
 const hash = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
 function archiveInfo(file) {

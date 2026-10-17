@@ -171,6 +171,24 @@ test('repeated successful prepare reuses the original and removes new extraction
   assert.throws(() => resolveExpectedCurrent(second, updatedHash, true), /differs/);
   assert.throws(() => resolveExpectedCurrent(upgraded, second.themedHash, false), /differs/);
 
+  // 2.0.32 remains version-bound and must not inherit the 2.0.25 theme hashes.
+  fs.writeFileSync(path.join(source, 'package.json'), '{"version":"2.0.32"}');
+  await asar.createPackage(source, installed);
+  const latestHash = hash(installed);
+  const previousMetadata = fs.readFileSync(path.join(root, 'prepared', 'manifest.json'));
+  await assert.rejects(prepare(app, root), /--upgrade/);
+  await prepare(app, root, { upgrade: true });
+  const latest = loadManifest('install', path.join(root, 'prepared', 'manifest.json'), root);
+  assert.equal(latest.version, '2.0.32');
+  assert.equal(latest.originalHash, latestHash);
+  assert.notEqual(latest.snapshot, upgraded.snapshot);
+  assert.deepEqual(latest.acceptedThemedHashes, []);
+  assert.equal(hash(installed), latestHash);
+  assert.equal(hash(upgraded.snapshot), updatedHash);
+  assert.deepEqual(fs.readFileSync(path.join(path.dirname(path.dirname(latest.output)), 'previous-manifest.json')), previousMetadata);
+  assert.throws(() => resolveExpectedCurrent(upgraded, latestHash, true), /differs/);
+  assert.throws(() => resolveExpectedCurrent(latest, upgraded.themedHash, false), /differs/);
+
   // --upgrade is not a bypass for arbitrary versions or same-version modifications.
   fs.writeFileSync(path.join(source, 'extra.txt'), 'unknown same-version change');
   await asar.createPackage(source, installed);

@@ -22,7 +22,7 @@
 | 环境 | 支持范围 |
 |---|---|
 | 系统 | Windows，仅此平台经过本机验收 |
-| OpenCode Desktop | **2.0.24 / 2.0.25**，其他版本明确拒绝；2.0.25 已完成本机资源构建校验，视觉效果需安装后验收 |
+| OpenCode Desktop | **2.0.24 / 2.0.25 / 2.0.32**，其他版本明确拒绝；2.0.32 已完成本机资源构建校验，视觉效果需安装后验收 |
 | Node.js | >= 22.12.0 |
 | 安装位置 | `%LOCALAPPDATA%\Programs\@opencode-aidesktop` |
 | 网络工具 | `curl.exe`、PowerShell（系统自带） |
@@ -72,7 +72,7 @@ node deploy.cjs install
 在同一目录更新源码后重新 `prepare`，退出桌面版再安装；构建会复用经校验的干净原包。
 当前应用哈希未知、版本不同、原生文件或素材校验失败时拒绝覆盖。
 
-### OpenCode 从 2.0.24 更新到 2.0.25 后
+### OpenCode 更新到更高的已支持版本后（当前支持至 2.0.32）
 
 官方更新会覆盖美化资源；旧 manifest 不可直接用于安装或恢复新版。
 **保存工作并完全退出桌面版**，双击 `Upgrade-Theme.cmd`，或执行：
@@ -97,6 +97,18 @@ node deploy.cjs restore --backup ".\backups\<版本与哈希目录>"
 
 **不要删除 `prepared/` 或 `backups/`，不要在应用更新后恢复旧版本。**
 此入口仍拒绝覆盖未知版本，备份 metadata 记录已安装的主题哈希。
+
+## 维护与同步要求（每次更新必做）
+
+本项目每次修改源码、适配 OpenCode 新版本或调整主题效果后，都必须完成以下同步，不能只更新本地文件：
+
+1. 更新本项目 `README.md` 的支持版本、使用方式及验证状态，并在 `CHANGELOG.md` 记录改动。
+2. 运行 `npm test`；版本适配还需运行 `node deploy.cjs prepare --upgrade`（首次构建使用 `prepare`）。构建成功不等于已安装或已通过视觉验收，应分别说明。
+3. 同时更新 `D:\project\AI_test\OpencodeSelfuse\README.md` 中的「桌面端 DS 美化（独立项目）」描述，保持支持版本、主题效果、安装／升级／恢复步骤和验证状态一致。该仓库已有的其他改动必须保留；只同步描述，不在 `OpencodeSelfuse` 二次保存主题源码、素材、构建产物或备份，也不重建主题副本目录。
+4. 确认本项目验证完成且 `OpencodeSelfuse/README.md` 描述一致，再分别提交并推送本主题仓库与 `OpencodeSelfuse` 仓库。主题 GitHub：`https://github.com/yunhesi-wind/opencode-desktop-ds-theme`（`origin`）；说明文档 GitHub：`https://github.com/yunhesi-wind/OpencodeSelfuse`。只提交本次相关源码、测试和文档，不夹带其他暂存或未暂存改动。不得上传背景视频、应用包、`prepared/`、`backups/`、`node_modules/`、凭据或个人截图。
+5. 完成后报告测试／构建结果、GitHub 提交及推送状态，以及 `OpencodeSelfuse/README.md` 是否已同步；推送失败或缺少权限时明确说明，不得将本地修改描述为已同步。
+
+桌面主题与 CLI 主题是独立项目：只更新发生变化的主题，不要求另一个主题同时升级或保持相同 OpenCode 版本。每次主题更新均需同步并推送 `OpencodeSelfuse` 的对应说明；纯描述更新不需要重新安装主题。各仓库提交并非原子操作，部分推送失败时分别报告并补推，不能宣称全部同步完成。
 
 ## 测试与本地预览
 
