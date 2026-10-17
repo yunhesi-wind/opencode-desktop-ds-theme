@@ -21,8 +21,44 @@ test('menus and sticky session toolbar have an opaque-enough glass backdrop', ()
   assert.match(css, /\[data-session-title\]\s*>\s*\.pointer-events-auto/);
   assert.match(css, /backdrop-filter:\s*blur\(28px\)/);
   assert.match(css, /\[data-slot="titlebar-v2"\]\s*\{\s*background: transparent !important/);
-  assert.match(css, /background: rgba\(7, 16, 31, 0\.58\) !important/);
-  assert.match(css, /:not\(\[data-titlebar-tab\] \*\)/);
+  assert.doesNotMatch(css, /\[data-slot="titlebar-v2"\]\s+\[/);
+});
+
+test('existing UI rules only change paint, never geometry, motion or input behavior', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const paint = new Set(['background', 'background-color', 'color', 'border-color', 'border-bottom-color',
+    'backdrop-filter', '-webkit-backdrop-filter', 'box-shadow']);
+  const decoration = new Set(['#opencode-bg-video', 'body::before']);
+  let rules = 0;
+  for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    rules++;
+    const selector = match[1].trim();
+    if (decoration.has(selector)) continue;
+    for (const declaration of match[2].split(';').filter((value) => value.trim())) {
+      const colon = declaration.indexOf(':');
+      assert.ok(colon > 0, 'Invalid declaration: ' + declaration);
+      const property = declaration.slice(0, colon).trim();
+      const value = declaration.slice(colon + 1).trim();
+      if (property.startsWith('--')) {
+        assert.match(value, /^(?:#[\da-f]+|rgba?\([^)]*\)|transparent|var\(--[\w-]+\))$/i,
+          'Custom tokens must remain colors: ' + property);
+      } else {
+        assert.ok(paint.has(property), 'Non-paint override on ' + selector + ': ' + property);
+      }
+    }
+  }
+  assert.ok(rules > 10, 'Expected production CSS rules to be checked');
+});
+
+test('decorative background cannot intercept native UI input', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'theme-fixed.css'), 'utf8');
+  for (const selector of ['#opencode-bg-video', 'body::before']) {
+    const start = css.indexOf(selector + ' {');
+    const block = css.slice(start, css.indexOf('}', start));
+    assert.match(block, /pointer-events:\s*none/);
+    assert.match(block, /position:\s*fixed/);
+    assert.match(block, /z-index:\s*-\d+/);
+  }
 });
 
 test('question, permission and dialog surfaces cover legacy white surface tokens without rewriting layout', () => {
@@ -33,7 +69,8 @@ test('question, permission and dialog surfaces cover legacy white surface tokens
     '[data-component="popover-content"]', '[data-component="hover-card-content"]']) {
     assert.ok(css.includes(selector), 'Missing floating surface: ' + selector);
   }
-  assert.match(css, /\[data-slot="question-option"\]\[data-picked="true"\]/);
+  assert.doesNotMatch(css, /\[data-slot="question-option"\]/);
+  assert.doesNotMatch(css, /\[data-component="menu-v2-item"\]/);
   assert.doesNotMatch(css, /\[data-component="dialog-v2"\]\s*\{/);
 });
 
@@ -64,6 +101,7 @@ test('native caption patch only changes symbol colors and rejects unknown layout
   const code = 'function A9(e,t){return{color:`#00000000`,symbolColor:e===`dark`?`white`:`black`,height:44}}';
   assert.equal(fixCaptionColors(code), code.replace('symbolColor:e===`dark`?`white`:`black`', 'symbolColor:`#d8e5f6`'));
   assert.throws(() => fixCaptionColors('unknown version'), /Unsupported/);
+  assert.throws(() => fixCaptionColors(code + code), /Unsupported/);
 });
 
 test('sent message glass bubble is scoped and uses contrasting dark text', () => {

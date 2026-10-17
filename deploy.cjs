@@ -139,7 +139,7 @@ async function prepare(app = APP, root = ROOT, { upgrade = false } = {}) {
     writeJsonAtomic(manifestPath, {
       format: 1, version: info.version, preset: PRESET.id, app,
       originalHash, themedHash: hash(output), snapshot, output, unpacked: originals,
-      acceptedThemedHashes, revision: 'readable-summary-submenus',
+      acceptedThemedHashes, revision: 'native-ui-preserved',
       created: new Date().toISOString(), upstreamCommit: 'b59ba94581ffb2d48b4e180194c119c9661cab99',
     });
     published = true;
@@ -163,7 +163,7 @@ async function buildTheme(snapshot, stage, info, originals, asset, themeCss) {
   const videoDir = path.join(extracted, 'out', 'renderer', 'assets');
   fs.mkdirSync(videoDir, { recursive: true });
   fs.copyFileSync(asset, path.join(videoDir, 'deepseek-bg.mp4'));
-  const video = '<video id="opencode-bg-video" autoplay loop muted playsinline src="./assets/deepseek-bg.mp4"></video>';
+  const video = '<video id="opencode-bg-video" aria-hidden="true" autoplay loop muted playsinline src="./assets/deepseek-bg.mp4"></video>';
   const html = originalHtml.replace(/(<body\b[^>]*>)/i, '$1\n' + video)
     .replace('</head>', '<style id="opencode-bg-correct-override">' + themeCss + '</style>\n</head>');
   fs.writeFileSync(index, html, 'utf8');
