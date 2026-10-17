@@ -6,7 +6,9 @@ const asar = require('@electron/asar');
 const { archiveInfo } = require('../deploy.cjs');
 
 const root = path.join(__dirname, '..');
-const css = fs.readFileSync(path.join(root, 'theme-fixed.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+const css = fs.readFileSync(path.join(root, 'theme-fixed.css'), 'utf8')
+  .replace(/\r\n?/g, '\n') // Keep exact selector assertions portable across Git checkout settings.
+  .replace(/\/\*[\s\S]*?\*\//g, '');
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
 
 test('opaque reading token is separate from translucent menu and question surfaces', () => {
