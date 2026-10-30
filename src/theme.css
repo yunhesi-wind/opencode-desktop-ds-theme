@@ -1,0 +1,126 @@
+/* ?????? v0.1 ??????????html ???????????????????*/
+
+:root {
+  --ds-skin-active: #010203 !important;
+  --background-base: transparent !important;
+  --background-weak: rgba(13, 23, 42, 0.78) !important;
+  --background-strong: rgba(13, 23, 42, 0.92) !important;
+  --background-stronger: rgba(13, 23, 42, 0.98) !important;
+  --surface-base: rgba(134, 178, 243, 0.06) !important;
+  --surface-base-hover: rgba(134, 178, 243, 0.12) !important;
+  --surface-base-active: rgba(134, 178, 243, 0.20) !important;
+  --surface-raised-base: rgba(16, 28, 49, 0.92) !important;
+  --surface-raised-base-hover: rgba(43, 64, 95, 0.96) !important;
+  --surface-raised-base-active: rgba(55, 78, 112, 0.98) !important;
+  --surface-raised-strong: rgba(16, 28, 49, 0.96) !important;
+  --surface-raised-stronger: rgba(12, 23, 42, 0.88) !important;
+  --surface-raised-stronger-non-alpha: #101e33 !important;
+  --surface-float-base: #101c31 !important;
+  --surface-float-base-hover: #1b2d47 !important;
+  --input-base: rgba(16, 28, 49, 0.90) !important;
+  --input-hover: rgba(24, 38, 62, 0.94) !important;
+  --input-focus: rgba(24, 38, 62, 0.98) !important;
+  --input-active: #182b46 !important;
+  --input-selected: #294568 !important;
+  --button-secondary-base: #14233a !important;
+  --button-secondary-hover: #223955 !important;
+  --button-ghost-hover: rgba(134, 178, 243, 0.12) !important;
+  --button-ghost-hover2: rgba(134, 178, 243, 0.20) !important;
+  --border-base: rgba(171, 196, 232, 0.18) !important;
+  --border-weak-base: rgba(171, 196, 232, 0.12) !important;
+  --border-strong-base: rgba(171, 196, 232, 0.40) !important;
+  --border-focus: #8db8ff !important;
+  --text-base: #c4d0e3 !important;
+  --text-weak: #a9bad1 !important;
+  --text-weaker: #8a9cb5 !important;
+  --text-strong: #eaf1fd !important;
+  --text-stronger: #f1f6ff !important;
+  --icon-base: #c4d0e3 !important;
+  --icon-weak: #a9bad1 !important;
+  --icon-strong: #eaf1fd !important;
+  --v2-background-bg-base: transparent !important;
+  --v2-background-bg-deep: rgba(8, 15, 29, 0.52) !important;
+  --v2-background-bg-layer-01: rgba(13, 23, 42, 0.80) !important;
+  --v2-background-bg-layer-02: rgba(16, 28, 49, 0.93) !important;
+  --v2-background-bg-layer-03: rgba(24, 38, 62, 0.96) !important;
+  --v2-background-bg-layer-04: rgba(31, 46, 71, 0.98) !important;
+  --v2-text-text-base: #e8eef8 !important;
+  --v2-text-text-muted: #b3c0d4 !important;
+  --v2-text-text-faint: #90a1b9 !important;
+  --v2-icon-icon-base: #d8e5f6 !important;
+  --v2-icon-icon-muted: #aabbd1 !important;
+  --v2-icon-icon-faint: #8195af !important;
+  --v2-border-border-base: rgba(171, 196, 232, 0.18) !important;
+  --v2-border-border-muted: rgba(171, 196, 232, 0.10) !important;
+  --v2-border-border-strong: rgba(171, 196, 232, 0.28) !important;
+  --v2-overlay-simple-overlay-scrim: rgba(3, 9, 19, 0.60) !important;
+}
+
+html {
+  background-color: #071321 !important;
+  background-image: radial-gradient(ellipse at 20% 10%, #193959 0%, transparent 60%),
+    linear-gradient(135deg, #0b2037, #071321) !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+body, #root {
+  background-color: transparent !important;
+}
+
+[data-slot="titlebar-v2"] {
+  background-color: transparent;
+  color: #d8e5f6;
+  border-bottom-color: rgba(171, 196, 232, 0.12);
+}
+
+/* 浮层：半透明深蓝表面（无模糊，避免包含块） */
+[data-component="context-menu-content"],
+[data-component="context-menu-sub-content"],
+[data-component="dropdown-menu-content"],
+[data-component="dropdown-menu-sub-content"],
+[data-component="menu-v2-content"],
+[data-component="select-v2-content"],
+[data-component="popover-content"],
+[data-component="hover-card-content"],
+[data-component="hover-card-v2-content"],
+[data-component="dialog-v2"] [data-slot="dialog-container"],
+[data-dock-surface="shell"],
+[data-dock-surface="tray"] {
+  background-color: rgba(12, 23, 42, 0.94) !important;
+  color: #e8eef8;
+  border-color: rgba(171, 196, 232, 0.22);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
+}
+
+/* 代码块只改底色，不动语法高亮与行高 */
+[data-component="markdown"] pre,
+[data-component="code"],
+[data-component="write-content"] {
+  background-color: rgba(10, 20, 36, 0.55) !important;
+}
+
+[data-component="markdown"] pre:has([data-component="code"]),
+[data-component="write-content"] [data-component="code"] {
+  background-color: transparent !important;
+}
+
+/* 已发送的用户气泡：浅灰玻璃底 + 深字，保持可读 */
+[data-component="user-message"]:not([data-pending]) [data-slot="user-message-text"] {
+  background-color: rgba(229, 233, 239, 0.88) !important;
+  color: #182334 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+[data-component="user-message"]:not([data-pending]) [data-slot="user-message-text"] .text-text-strong {
+  color: #182334 !important;
+}
+
+/* 滚动条只改颜色 */
+.session-service-menu,
+.directory-picker-browser,
+.settings-nav-groups,
+[data-component="markdown"] table {
+  scrollbar-color: #627b9e transparent;
+}

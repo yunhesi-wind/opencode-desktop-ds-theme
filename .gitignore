@@ -1,6 +1,6 @@
 node_modules/
 assets/
-runtime/
-backups/
-*.download
+src/video.generated.ts
+src/background.generated.css
+src/_video.tmp.mp4
 *.log

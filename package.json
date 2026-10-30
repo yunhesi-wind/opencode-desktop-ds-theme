@@ -1,18 +1,26 @@
 {
-  "name": "opencode-desktop-ds-theme",
-  "version": "2.0.0",
+  "name": "ds-deepsea-skin",
+  "version": "0.1.0",
   "private": true,
-  "description": "深海大肥鱼: selectable OpenCode Desktop theme with scoped glass styling and verified original restoration",
-  "license": "MIT",
-  "repository": "https://github.com/yunhesi-wind/opencode-desktop-ds-theme",
-  "scripts": {
-    "prepare-theme": "node deploy.cjs prepare",
-    "install-theme": "node deploy.cjs install",
-    "restore-theme": "node deploy.cjs restore",
-    "status": "node deploy.cjs status",
-    "download-background": "node download-background.cjs",
-    "test": "node --test test/*.test.cjs"
+  "type": "module",
+  "exports": {
+    "./gui-experimental": "./dist/gui-experimental.cjs"
   },
-  "engines": { "node": ">=22.12.0" },
-  "dependencies": { "@electron/asar": "4.3.1" }
+  "files": ["dist"],
+  "scripts": {
+    "generate": "node scripts/make-background.mjs",
+    "check:css": "node scripts/check-css.mjs",
+    "test": "node scripts/check-css.test.mjs",
+    "build": "node scripts/make-video.mjs && node scripts/make-background.mjs && node scripts/check-css.mjs && node scripts/check-css.test.mjs && vite build"
+  },
+  "dependencies": {
+    "@opencode/plugin": "latest"
+  },
+  "devDependencies": {
+    "effect": "^3.0.0",
+    "solid-js": "^1.9.0",
+    "vite": "^7.0.0",
+    "vite-plugin-solid": "^2.11.0",
+    "postcss": "^8.5.0"
+  }
 }

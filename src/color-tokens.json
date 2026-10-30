@@ -1,0 +1,20 @@
+[
+  "--ds-skin-active",
+  "--background-base", "--background-weak", "--background-strong", "--background-stronger",
+  "--surface-base", "--surface-base-hover", "--surface-base-active",
+  "--surface-raised-base", "--surface-raised-base-hover", "--surface-raised-base-active",
+  "--surface-raised-strong", "--surface-raised-stronger", "--surface-raised-stronger-non-alpha",
+  "--surface-float-base", "--surface-float-base-hover",
+  "--input-base", "--input-hover", "--input-focus", "--input-active", "--input-selected",
+  "--button-secondary-base", "--button-secondary-hover", "--button-ghost-hover", "--button-ghost-hover2",
+  "--border-base", "--border-weak-base", "--border-strong-base", "--border-focus",
+  "--text-base", "--text-weak", "--text-weaker", "--text-strong", "--text-stronger",
+  "--icon-base", "--icon-weak", "--icon-strong",
+  "--v2-background-bg-base", "--v2-background-bg-deep",
+  "--v2-background-bg-layer-01", "--v2-background-bg-layer-02",
+  "--v2-background-bg-layer-03", "--v2-background-bg-layer-04",
+  "--v2-text-text-base", "--v2-text-text-muted", "--v2-text-text-faint",
+  "--v2-icon-icon-base", "--v2-icon-icon-muted", "--v2-icon-icon-faint",
+  "--v2-border-border-base", "--v2-border-border-muted", "--v2-border-border-strong",
+  "--v2-overlay-simple-overlay-scrim"
+]
